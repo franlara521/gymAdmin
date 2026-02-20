@@ -1,0 +1,47 @@
+{% extends "base_client.html" %}
+{% block title %}Mensajes — GymAdmin{% endblock %}
+{% block nav_messages %}active{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-chat-dots me-2"></i>Mensajes</h1>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header">
+        Conversación con el equipo del gimnasio
+      </div>
+
+      <div class="card-body p-0">
+        <div id="message-list" style="height: 400px; overflow-y: auto; padding: 1rem;">
+          {% include "messaging/client/partials/message_list.html" %}
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <form hx-post="{% url 'client_messaging:send' %}"
+              hx-target="#message-list"
+              hx-swap="innerHTML"
+              hx-on::after-request="this.reset(); document.getElementById('message-list').scrollTop = document.getElementById('message-list').scrollHeight;">
+          {% csrf_token %}
+          <div class="input-group">
+            <textarea name="body" class="form-control" rows="2"
+                      placeholder="Escribe tu mensaje…" required></textarea>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-send"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Scroll al final al cargar
+  const msgList = document.getElementById('message-list');
+  if (msgList) msgList.scrollTop = msgList.scrollHeight;
+</script>
+{% endblock %}

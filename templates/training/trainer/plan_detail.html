@@ -1,0 +1,63 @@
+{% extends "base_trainer.html" %}
+{% block title %}{{ plan.title }} — Entrenador{% endblock %}
+{% block nav_training %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center gap-3 mb-4">
+  <a href="{% url 'trainer_training:plan_list' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left"></i>
+  </a>
+  <h1 class="h3 mb-0">{{ plan.title }}</h1>
+  <a href="{% url 'trainer_training:plan_edit' plan.pk %}" class="btn btn-warning btn-sm ms-auto">
+    <i class="bi bi-pencil me-1"></i>Editar
+  </a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="text-muted small">Tipo</div>
+        <div class="fw-semibold">{{ plan.get_plan_type_display }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="text-muted small">Cliente asignado</div>
+        <div class="fw-semibold">
+          {{ plan.assigned_to.get_full_name|default:plan.assigned_to.username|default:"—" }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="text-muted small">Estado</div>
+        <div>
+          {% if plan.is_active %}
+            <span class="badge bg-success fs-6">Activo</span>
+          {% else %}
+            <span class="badge bg-secondary fs-6">Inactivo</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% for section in plan.sections.all %}
+  <div class="card shadow-sm mb-3">
+    <div class="card-header fw-semibold">
+      {{ section.order }}. {{ section.title }}
+    </div>
+    <div class="card-body">
+      <pre class="mb-0" style="white-space:pre-wrap;font-family:inherit;">{{ section.content }}</pre>
+    </div>
+  </div>
+{% empty %}
+  <div class="alert alert-info">Este plan no tiene secciones todavía.</div>
+{% endfor %}
+{% endblock %}

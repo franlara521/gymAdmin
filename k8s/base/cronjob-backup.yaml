@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: gymadmin-db-backup
+  namespace: gymadmin
+spec:
+  schedule: "0 3 * * *"     # 3 AM todos los días
+  concurrencyPolicy: Forbid  # No ejecutar si el anterior sigue en curso
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: busybox:latest
+              command:
+                - /bin/sh
+                - /scripts/backup-db.sh
+              volumeMounts:
+                - name: db-volume
+                  mountPath: /app/data
+                  readOnly: true
+                - name: backup-volume
+                  mountPath: /app/backups
+                - name: scripts-volume
+                  mountPath: /scripts
+          volumes:
+            - name: db-volume
+              persistentVolumeClaim:
+                claimName: gymadmin-db-pvc
+            - name: backup-volume
+              persistentVolumeClaim:
+                claimName: gymadmin-backup-pvc
+            - name: scripts-volume
+              configMap:
+                name: gymadmin-backup-script
+                defaultMode: 0755

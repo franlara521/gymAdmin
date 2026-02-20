@@ -1,0 +1,99 @@
+{% extends "base_client.html" %}
+{% block title %}Mi dashboard — GymAdmin{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-bar-chart-line me-2"></i>Mi dashboard</h1>
+
+<!-- Stats resumen -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-4">
+    <div class="card shadow-sm text-center">
+      <div class="card-body py-3">
+        <div class="h2 text-primary mb-0">{{ total_confirmed }}</div>
+        <div class="small text-muted">Clases reservadas</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="card shadow-sm text-center">
+      <div class="card-body py-3">
+        <div class="h2 text-success mb-0">{{ total_attended }}</div>
+        <div class="small text-muted">Clases asistidas</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="card shadow-sm text-center">
+      <div class="card-body py-3">
+        <div class="h2 text-warning mb-0">{{ active_plans }}</div>
+        <div class="small text-muted">Planes activos</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Gráfico asistencia -->
+  <div class="col-12 col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header"><i class="bi bi-graph-up me-2"></i>Mi asistencia (últimas 12 semanas)</div>
+      <div class="card-body">
+        <canvas id="attendanceChart" height="80"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Próximas clases -->
+  <div class="col-12 col-lg-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header"><i class="bi bi-calendar-check me-2"></i>Próximas clases</div>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+          {% for booking in upcoming_bookings %}
+            <li class="list-group-item">
+              <div class="d-flex align-items-center gap-2">
+                <span class="d-inline-block rounded-circle flex-shrink-0"
+                      style="width:10px;height:10px;background:{{ booking.gym_class.class_type.color }};"></span>
+                <div>
+                  <div class="fw-bold small">{{ booking.gym_class.class_type.name }}</div>
+                  <div class="text-muted" style="font-size:0.78rem;">
+                    {{ booking.gym_class.start_datetime|date:"D d/m" }} {{ booking.gym_class.start_datetime|time:"H:i" }}
+                  </div>
+                </div>
+              </div>
+            </li>
+          {% empty %}
+            <li class="list-group-item text-center text-muted py-3">
+              Sin próximas clases reservadas.
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% if upcoming_bookings %}
+        <div class="card-footer text-center">
+          <a href="{% url 'client_schedule:schedule' %}" class="btn btn-outline-primary btn-sm">
+            Ver horario completo
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  const attCtx = document.getElementById('attendanceChart').getContext('2d');
+  new Chart(attCtx, {
+    type: 'line',
+    data: {{ attendance_chart_data|safe }},
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+  });
+</script>
+{% endblock %}

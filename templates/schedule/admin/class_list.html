@@ -1,0 +1,101 @@
+{% extends "base_admin.html" %}
+{% block title %}Clases — GymAdmin{% endblock %}
+{% block nav_schedule %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0"><i class="bi bi-calendar3 me-2"></i>Gestión de clases</h1>
+  <div class="d-flex gap-2">
+    <a href="{% url 'admin_schedule:class_types' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-tags me-1"></i>Tipos de clase
+    </a>
+    <a href="{% url 'admin_schedule:class_create' %}" class="btn btn-primary btn-sm">
+      <i class="bi bi-plus-circle me-1"></i>Nueva clase
+    </a>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Tipo</th>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Instructor</th>
+          <th>Aforo</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cls in classes %}
+          <tr {% if cls.is_cancelled %}class="table-secondary text-muted"{% endif %}>
+            <td>
+              <span class="d-inline-block rounded-circle me-1"
+                    style="width:12px;height:12px;background:{{ cls.class_type.color }};"></span>
+              {{ cls.class_type.name }}
+            </td>
+            <td>{{ cls.start_datetime|date:"d/m/Y" }}</td>
+            <td>{{ cls.start_datetime|time:"H:i" }} — {{ cls.end_datetime|time:"H:i" }}</td>
+            <td>{{ cls.instructor.get_full_name|default:"—" }}</td>
+            <td>
+              <span class="{% if cls.is_full %}text-danger{% else %}text-success{% endif %}">
+                {{ cls.confirmed_count }}/{{ cls.capacity }}
+              </span>
+            </td>
+            <td>
+              {% if cls.is_cancelled %}
+                <span class="badge bg-secondary">Cancelada</span>
+              {% else %}
+                <span class="badge bg-success">Activa</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex gap-1">
+                <a href="{% url 'admin_schedule:class_attendees' cls.pk %}"
+                   class="btn btn-sm btn-outline-info" title="Asistentes">
+                  <i class="bi bi-people"></i>
+                </a>
+                <a href="{% url 'admin_schedule:class_edit' cls.pk %}"
+                   class="btn btn-sm btn-outline-primary" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'admin_schedule:class_delete' cls.pk %}"
+                   class="btn btn-sm btn-outline-danger" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">No hay clases registradas.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if is_paginated %}
+  <nav class="mt-3">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}"><i class="bi bi-chevron-left"></i></a>
+        </li>
+      {% endif %}
+      <li class="page-item disabled">
+        <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      </li>
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="bi bi-chevron-right"></i></a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+{% endblock %}

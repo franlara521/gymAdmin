@@ -1,0 +1,73 @@
+{% extends "base_admin.html" %}
+{% block title %}{{ plan.title }} — GymAdmin{% endblock %}
+{% block nav_training %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <a href="{% url 'admin_training:plan_list' %}" class="text-muted text-decoration-none small">
+      <i class="bi bi-chevron-left"></i> Planes
+    </a>
+    <h1 class="h3 mb-0 mt-1">{{ plan.title }}</h1>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'admin_training:plan_edit' plan.pk %}" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-pencil me-1"></i>Editar
+    </a>
+    <a href="{% url 'admin_training:plan_delete' plan.pk %}" class="btn btn-outline-danger btn-sm">
+      <i class="bi bi-trash me-1"></i>Eliminar
+    </a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-md-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <dl class="mb-0">
+          <dt class="text-muted small">Tipo</dt>
+          <dd>
+            <span class="badge
+              {% if plan.plan_type == 'training' %}bg-primary
+              {% elif plan.plan_type == 'diet' %}bg-success
+              {% else %}bg-warning text-dark{% endif %}">
+              {{ plan.get_plan_type_display }}
+            </span>
+          </dd>
+          <dt class="text-muted small mt-2">Asignado a</dt>
+          <dd>
+            <a href="{% url 'gym_admin:client_detail' plan.assigned_to.pk %}">
+              {{ plan.assigned_to.get_full_name|default:plan.assigned_to.username }}
+            </a>
+          </dd>
+          <dt class="text-muted small mt-2">Creado por</dt>
+          <dd>{{ plan.created_by.get_full_name|default:"—" }}</dd>
+          <dt class="text-muted small mt-2">Actualizado</dt>
+          <dd>{{ plan.updated_at|date:"d/m/Y" }}</dd>
+          <dt class="text-muted small mt-2">Estado</dt>
+          <dd>{% if plan.is_active %}<span class="badge bg-success">Activo</span>{% else %}<span class="badge bg-secondary">Inactivo</span>{% endif %}</dd>
+        </dl>
+        {% if plan.notes %}
+          <hr>
+          <p class="small text-muted mb-0">{{ plan.notes }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-9">
+    {% for section in plan.sections.all %}
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-light fw-bold">
+          <i class="bi bi-bookmark me-2"></i>{{ section.title }}
+        </div>
+        <div class="card-body">
+          <div style="white-space: pre-line;">{{ section.content }}</div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted">Este plan no tiene secciones.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

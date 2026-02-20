@@ -1,0 +1,46 @@
+{% extends "base_trainer.html" %}
+{% block title %}Inicio — Portal Entrenador{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">
+  <i class="bi bi-person-video3 me-2"></i>Bienvenido, {{ request.user.get_full_name|default:request.user.username }}
+</h1>
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-body text-center">
+        <i class="bi bi-calendar3 text-warning" style="font-size:2.5rem;"></i>
+        <h5 class="mt-2">Mis clases</h5>
+        <p class="text-muted small">Consulta tu horario semanal y gestiona la asistencia.</p>
+        <a href="{% url 'trainer_schedule:schedule' %}" class="btn btn-warning btn-sm">Ver horario</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-body text-center">
+        <i class="bi bi-clipboard2-pulse text-success" style="font-size:2.5rem;"></i>
+        <h5 class="mt-2">Planes de entrenamiento</h5>
+        <p class="text-muted small">Crea y gestiona planes para tus clientes.</p>
+        <a href="{% url 'trainer_training:plan_list' %}" class="btn btn-success btn-sm">Ver planes</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-body text-center">
+        <i class="bi bi-chat-dots text-primary" style="font-size:2.5rem;"></i>
+        <h5 class="mt-2">Mensajes</h5>
+        <p class="text-muted small">Comunícate con tus clientes.</p>
+        <a href="{% url 'trainer_messaging:inbox' %}" class="btn btn-primary btn-sm">
+          Ir a mensajes
+          {% if unread_admin_count %}
+            <span class="badge bg-danger ms-1">{{ unread_admin_count }}</span>
+          {% endif %}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

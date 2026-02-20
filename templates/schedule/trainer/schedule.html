@@ -1,0 +1,13 @@
+{% extends "base_trainer.html" %}
+{% block title %}Mis clases — Portal Entrenador{% endblock %}
+{% block nav_schedule %}active{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-calendar3 me-2"></i>Mis clases</h1>
+<div id="week-grid"
+     hx-get="{% url 'trainer_schedule:week_grid' %}?week={{ offset }}"
+     hx-trigger="load"
+     hx-swap="innerHTML">
+  {% include "schedule/trainer/partials/week_grid.html" %}
+</div>
+{% endblock %}

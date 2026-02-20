@@ -1,0 +1,44 @@
+<div id="class-card-{{ cls.pk }}" class="card mb-2 shadow-sm"
+     style="border-left: 4px solid {{ cls.class_type.color }};">
+  <div class="card-body p-2">
+    <div class="fw-bold small">{{ cls.class_type.name }}</div>
+    <div class="text-muted" style="font-size:0.78rem;">
+      <i class="bi bi-clock"></i>
+      {{ cls.start_datetime|time:"H:i" }} — {{ cls.end_datetime|time:"H:i" }}
+    </div>
+    {% if cls.instructor %}
+      <div class="text-muted" style="font-size:0.78rem;">
+        <i class="bi bi-person"></i> {{ cls.instructor.get_full_name|default:cls.instructor.username }}
+      </div>
+    {% endif %}
+    <div class="d-flex justify-content-between align-items-center mt-1">
+      <span class="badge {% if cls.is_full %}bg-danger{% else %}bg-success{% endif %}" style="font-size:0.7rem;">
+        {{ cls.spots_available }}/{{ cls.capacity }} libres
+      </span>
+      {% if cls.pk in user_booked %}
+        <form hx-post="{% url 'client_schedule:cancel' cls.pk %}"
+              hx-target="#class-card-{{ cls.pk }}"
+              hx-swap="outerHTML">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-warning btn-sm py-0 px-2" style="font-size:0.75rem;">
+            Cancelar
+          </button>
+        </form>
+      {% elif not cls.is_full %}
+        <form hx-post="{% url 'client_schedule:book' cls.pk %}"
+              hx-target="#class-card-{{ cls.pk }}"
+              hx-swap="outerHTML">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary btn-sm py-0 px-2" style="font-size:0.75rem;">
+            Reservar
+          </button>
+        </form>
+      {% else %}
+        <span class="text-danger" style="font-size:0.75rem;">Completa</span>
+      {% endif %}
+    </div>
+    {% if error %}
+      <div class="text-danger mt-1" style="font-size:0.75rem;">{{ error }}</div>
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,42 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <button class="btn btn-outline-warning btn-sm"
+          hx-get="{% url 'trainer_schedule:week_grid' %}?week={{ offset|add:'-1' }}"
+          hx-target="#week-grid" hx-swap="innerHTML">
+    <i class="bi bi-chevron-left"></i> Semana anterior
+  </button>
+  <span class="fw-semibold">
+    {{ week_start|date:"d M" }} – {{ week_end|date:"d M Y" }}
+  </span>
+  <button class="btn btn-outline-warning btn-sm"
+          hx-get="{% url 'trainer_schedule:week_grid' %}?week={{ offset|add:'1' }}"
+          hx-target="#week-grid" hx-swap="innerHTML">
+    Semana siguiente <i class="bi bi-chevron-right"></i>
+  </button>
+</div>
+
+<div class="row g-2">
+  {% for day, classes in days_classes %}
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="card shadow-sm h-100 {% if day == today %}border-warning border-2{% endif %}">
+        <div class="card-header py-1 {% if day == today %}bg-warning text-dark{% else %}bg-light{% endif %}">
+          <small class="fw-semibold">{{ day|date:"l d/m" }}</small>
+        </div>
+        <div class="card-body p-2">
+          {% for cls in classes %}
+            <div class="mb-2 p-2 rounded" style="background:{{ cls.class_type.color }}22; border-left:3px solid {{ cls.class_type.color }};">
+              <div class="fw-semibold small">{{ cls.class_type.name }}</div>
+              <div class="text-muted" style="font-size:0.78rem;">
+                {{ cls.start_datetime|time:"H:i" }} — {{ cls.confirmed_count }}/{{ cls.capacity }} alumnos
+              </div>
+              <a href="{% url 'trainer_schedule:class_detail' cls.pk %}" class="btn btn-outline-warning btn-sm mt-1 w-100" style="font-size:0.75rem;">
+                <i class="bi bi-people me-1"></i>Asistencia
+              </a>
+            </div>
+          {% empty %}
+            <p class="text-muted small mb-0">Sin clases</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>

@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: gymadmin-dev
+
+resources:
+  - ../../base
+
+patches:
+  - path: patch-deployment.yaml
+    target:
+      kind: Deployment
+      name: gymadmin
+
+configMapGenerator:
+  - name: gymadmin-config
+    behavior: merge
+    literals:
+      - DJANGO_ENV=dev
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,gymadmin-dev.svc.cluster.local
+
+images:
+  - name: gymadmin
+    newTag: dev

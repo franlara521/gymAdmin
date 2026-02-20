@@ -1,0 +1,47 @@
+{% extends "base_admin.html" %}
+{% block title %}Mensajes — GymAdmin{% endblock %}
+{% block nav_messages %}active{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-chat-dots me-2"></i>Bandeja de mensajes</h1>
+
+<div class="card shadow-sm">
+  <div class="list-group list-group-flush">
+    {% for thread in threads %}
+      <a href="{% url 'admin_messaging:thread_detail' thread.pk %}"
+         class="list-group-item list-group-item-action {% if thread.unread_by_admin_count %}list-group-item-warning{% endif %}">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center"
+                 style="width:40px;height:40px;flex-shrink:0;">
+              <i class="bi bi-person-fill text-white"></i>
+            </div>
+            <div>
+              <strong>{{ thread.client.get_full_name|default:thread.client.username }}</strong>
+              {% if thread.unread_by_admin_count %}
+                <span class="badge bg-danger ms-2">{{ thread.unread_by_admin_count }} nuevo{{ thread.unread_by_admin_count|pluralize }}</span>
+              {% endif %}
+              {% if thread.last_message %}
+                <div class="text-muted small text-truncate" style="max-width:300px;">
+                  {{ thread.last_message.body|truncatechars:60 }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="text-muted small text-end">
+            {% if thread.last_message %}
+              {{ thread.last_message.sent_at|date:"d/m H:i" }}
+            {% endif %}
+            <div><i class="bi bi-chevron-right"></i></div>
+          </div>
+        </div>
+      </a>
+    {% empty %}
+      <div class="list-group-item text-center text-muted py-5">
+        <i class="bi bi-chat-dots" style="font-size:2rem;"></i>
+        <p class="mt-2">No hay conversaciones aún.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

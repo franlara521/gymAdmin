@@ -1,0 +1,6 @@
+{% extends "base_admin.html" %}
+{% block title %}Admin inicio — GymAdmin{% endblock %}
+{% block content %}
+{% comment %}Redirección inmediata al dashboard{% endcomment %}
+<script>window.location.href = "{% url 'admin_dashboard:dashboard' %}";</script>
+{% endblock %}

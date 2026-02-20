@@ -1,0 +1,45 @@
+{% extends "base_client.html" %}
+{% block title %}Inicio — GymAdmin{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-12 col-md-8">
+    <h1 class="h3 mb-1">Hola, {{ request.user.get_full_name|default:request.user.username }} 👋</h1>
+    <p class="text-muted mb-4">Bienvenido a tu portal de gimnasio.</p>
+    <div class="row g-3">
+      <div class="col-6 col-md-3">
+        <a href="{% url 'client_schedule:schedule' %}" class="text-decoration-none">
+          <div class="card shadow-sm text-center py-4">
+            <i class="bi bi-calendar3 text-primary" style="font-size:2rem;"></i>
+            <div class="mt-2 small fw-bold">Horario</div>
+          </div>
+        </a>
+      </div>
+      <div class="col-6 col-md-3">
+        <a href="{% url 'client_training:plan_list' %}" class="text-decoration-none">
+          <div class="card shadow-sm text-center py-4">
+            <i class="bi bi-clipboard2-pulse text-success" style="font-size:2rem;"></i>
+            <div class="mt-2 small fw-bold">Mis planes</div>
+          </div>
+        </a>
+      </div>
+      <div class="col-6 col-md-3">
+        <a href="{% url 'client_messaging:inbox' %}" class="text-decoration-none">
+          <div class="card shadow-sm text-center py-4">
+            <i class="bi bi-chat-dots text-warning" style="font-size:2rem;"></i>
+            <div class="mt-2 small fw-bold">Mensajes</div>
+          </div>
+        </a>
+      </div>
+      <div class="col-6 col-md-3">
+        <a href="{% url 'client_dashboard:dashboard' %}" class="text-decoration-none">
+          <div class="card shadow-sm text-center py-4">
+            <i class="bi bi-bar-chart-line text-info" style="font-size:2rem;"></i>
+            <div class="mt-2 small fw-bold">Dashboard</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base_client.html" %}
+{% block title %}Horario — GymAdmin{% endblock %}
+{% block nav_schedule %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0"><i class="bi bi-calendar3 me-2"></i>Horario de clases</h1>
+  <a href="{% url 'client_schedule:history' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-clock-history me-1"></i>Mi historial
+  </a>
+</div>
+
+<div id="week-grid"
+     hx-get="{% url 'client_schedule:week_grid' %}?week={{ offset }}"
+     hx-trigger="load"
+     hx-target="#week-grid"
+     hx-swap="innerHTML">
+  {% include "schedule/client/partials/week_grid.html" %}
+</div>
+{% endblock %}

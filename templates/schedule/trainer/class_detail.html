@@ -1,0 +1,118 @@
+{% extends "base_trainer.html" %}
+{% block title %}Clase: {{ gym_class.class_type.name }} — Entrenador{% endblock %}
+{% block nav_schedule %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center gap-3 mb-4">
+  <a href="{% url 'trainer_schedule:schedule' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left"></i>
+  </a>
+  <h1 class="h3 mb-0">
+    <span class="d-inline-block rounded me-2"
+          style="width:14px;height:14px;background:{{ gym_class.class_type.color }};vertical-align:middle;"></span>
+    {{ gym_class.class_type.name }}
+  </h1>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card shadow-sm text-center">
+      <div class="card-body">
+        <div class="h4">{{ gym_class.start_datetime|date:"d/m/Y" }}</div>
+        <div class="text-muted small">Fecha</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm text-center">
+      <div class="card-body">
+        <div class="h4">{{ gym_class.start_datetime|time:"H:i" }}</div>
+        <div class="text-muted small">Hora inicio</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm text-center">
+      <div class="card-body">
+        <div class="h4">{{ gym_class.confirmed_count }} / {{ gym_class.capacity }}</div>
+        <div class="text-muted small">Alumnos</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm text-center">
+      <div class="card-body">
+        <div class="h4">
+          {% if gym_class.is_cancelled %}
+            <span class="text-danger">Cancelada</span>
+          {% else %}
+            <span class="text-success">Activa</span>
+          {% endif %}
+        </div>
+        <div class="text-muted small">Estado</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if messages %}
+  {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }} alert-dismissible fade show">
+      {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<div class="card shadow-sm">
+  <div class="card-header"><i class="bi bi-people me-2"></i>Lista de asistentes</div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Alumno</th>
+          <th>Estado</th>
+          <th>Reservado el</th>
+          <th>Marcar</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for booking in bookings %}
+          <tr>
+            <td>{{ booking.client.get_full_name|default:booking.client.username }}</td>
+            <td>
+              {% if booking.status == "attended" %}
+                <span class="badge bg-success">Asistió</span>
+              {% elif booking.status == "no_show" %}
+                <span class="badge bg-danger">No asistió</span>
+              {% else %}
+                <span class="badge bg-primary">Confirmado</span>
+              {% endif %}
+            </td>
+            <td class="text-muted small">{{ booking.booked_at|date:"d/m/Y H:i" }}</td>
+            <td>
+              <form method="post"
+                    action="{% url 'trainer_schedule:mark_attendance' gym_class.pk booking.pk %}"
+                    class="d-flex gap-1">
+                {% csrf_token %}
+                <button name="status" value="attended" class="btn btn-success btn-sm">
+                  <i class="bi bi-check-lg"></i>
+                </button>
+                <button name="status" value="no_show" class="btn btn-danger btn-sm">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+                <button name="status" value="confirmed" class="btn btn-outline-secondary btn-sm">
+                  <i class="bi bi-arrow-counterclockwise"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4" class="text-center text-muted py-4">Sin reservas confirmadas.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

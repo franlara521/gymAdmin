@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: gymadmin-prod
+
+resources:
+  - ../../base
+  - ingress.yaml
+
+patches:
+  - path: patch-resources.yaml
+    target:
+      kind: Deployment
+      name: gymadmin
+
+configMapGenerator:
+  - name: gymadmin-config
+    behavior: merge
+    literals:
+      - DJANGO_ENV=prod
+      - DJANGO_ALLOWED_HOSTS=gym.example.com
+
+images:
+  - name: gymadmin
+    newName: registry.example.com/gymadmin
+    newTag: "1.0.0"

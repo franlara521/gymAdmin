@@ -1,0 +1,57 @@
+{% extends "base_admin.html" %}
+{% block title %}Conversación con {{ thread.client.get_full_name }} — GymAdmin{% endblock %}
+{% block nav_messages %}active{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{% url 'admin_messaging:inbox' %}" class="text-muted text-decoration-none small">
+    <i class="bi bi-chevron-left"></i> Mensajes
+  </a>
+  <h1 class="h3 mb-0 mt-1">
+    Conversación con {{ thread.client.get_full_name|default:thread.client.username }}
+  </h1>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-body" style="height: 400px; overflow-y: auto; padding: 1rem;">
+        {% for msg in messages_list %}
+          <div class="d-flex {% if msg.sender.is_staff %}justify-content-end{% else %}justify-content-start{% endif %} mb-3">
+            <div class="rounded px-3 py-2 shadow-sm"
+                 style="max-width: 75%;
+                        background: {% if msg.sender.is_staff %}#212529{% else %}#f8f9fa{% endif %};
+                        color: {% if msg.sender.is_staff %}#fff{% else %}#212529{% endif %};">
+              <div style="font-size:0.7rem; opacity:0.7; margin-bottom:2px;">
+                {{ msg.sender.get_full_name|default:msg.sender.username }} · {{ msg.sent_at|date:"d/m H:i" }}
+              </div>
+              <div style="white-space: pre-line;">{{ msg.body }}</div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="text-center text-muted py-4">Sin mensajes aún.</div>
+        {% endfor %}
+      </div>
+      <div class="card-footer">
+        <form method="post" action="{% url 'admin_messaging:reply' thread.pk %}">
+          {% csrf_token %}
+          <div class="input-group">
+            <textarea name="body" class="form-control" rows="2"
+                      placeholder="Escribe tu respuesta…" required></textarea>
+            <button type="submit" class="btn btn-dark">
+              <i class="bi bi-send"></i> Enviar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const msgArea = document.querySelector('.card-body[style*="overflow-y"]');
+  if (msgArea) msgArea.scrollTop = msgArea.scrollHeight;
+</script>
+{% endblock %}

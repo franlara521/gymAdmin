@@ -1,0 +1,37 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <button class="btn btn-outline-primary btn-sm"
+          hx-get="{% url 'client_schedule:week_grid' %}?week={{ offset|add:"-1" }}"
+          hx-target="#week-grid"
+          hx-swap="innerHTML">
+    <i class="bi bi-chevron-left"></i> Anterior
+  </button>
+  <h5 class="mb-0">
+    {{ week_start|date:"d M" }} — {{ week_end|date:"d M Y" }}
+  </h5>
+  <button class="btn btn-outline-primary btn-sm"
+          hx-get="{% url 'client_schedule:week_grid' %}?week={{ offset|add:"1" }}"
+          hx-target="#week-grid"
+          hx-swap="innerHTML">
+    Siguiente <i class="bi bi-chevron-right"></i>
+  </button>
+</div>
+
+<div class="row g-2">
+  {% for day, day_classes in days_classes %}
+    <div class="col-12 col-sm-6 col-lg-3 col-xl-auto flex-xl-fill">
+      <div class="card h-100 {% if day == today %}border-primary{% endif %}">
+        <div class="card-header py-2 {% if day == today %}bg-primary text-white{% else %}bg-light{% endif %}">
+          <strong>{{ day|date:"D" }}</strong>
+          <span class="small ms-1">{{ day|date:"d/m" }}</span>
+        </div>
+        <div class="card-body p-2">
+          {% for cls in day_classes %}
+            {% include "schedule/client/partials/class_card.html" with booked=cls.pk|stringformat:"s" in user_booked %}
+          {% empty %}
+            <p class="text-muted small text-center mt-2">Sin clases</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>

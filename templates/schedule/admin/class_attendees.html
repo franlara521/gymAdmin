@@ -1,0 +1,60 @@
+{% extends "base_admin.html" %}
+{% block title %}Asistentes — {{ gym_class }} — GymAdmin{% endblock %}
+{% block nav_schedule %}active{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{% url 'admin_schedule:class_list' %}" class="text-muted text-decoration-none small">
+    <i class="bi bi-chevron-left"></i> Clases
+  </a>
+  <h1 class="h3 mb-0 mt-1">Asistentes: {{ gym_class.class_type.name }}</h1>
+  <p class="text-muted">{{ gym_class.start_datetime|date:"d/m/Y H:i" }}</p>
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Cliente</th>
+          <th>Reservado el</th>
+          <th>Estado</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for booking in bookings %}
+          <tr>
+            <td>{{ booking.client.get_full_name|default:booking.client.username }}</td>
+            <td>{{ booking.booked_at|date:"d/m/Y H:i" }}</td>
+            <td>
+              {% if booking.status == "attended" %}
+                <span class="badge bg-success">Asistió</span>
+              {% elif booking.status == "no_show" %}
+                <span class="badge bg-danger">No se presentó</span>
+              {% else %}
+                <span class="badge bg-primary">Confirmada</span>
+              {% endif %}
+            </td>
+            <td>
+              <form method="post" action="{% url 'admin_schedule:mark_attended' gym_class.pk booking.pk %}" class="d-inline-flex gap-1">
+                {% csrf_token %}
+                <button name="status" value="attended" class="btn btn-sm btn-success py-0 px-2">
+                  <i class="bi bi-check"></i>
+                </button>
+                <button name="status" value="no_show" class="btn btn-sm btn-danger py-0 px-2">
+                  <i class="bi bi-x"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4" class="text-center text-muted py-4">Sin reservas confirmadas.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

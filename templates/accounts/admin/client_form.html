@@ -1,0 +1,62 @@
+{% extends "base_admin.html" %}
+{% block title %}{% if client_user %}Editar cliente{% else %}Nuevo cliente{% endif %} — GymAdmin{% endblock %}
+{% block nav_clients %}active{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{% url 'gym_admin:client_list' %}" class="text-muted text-decoration-none small">
+    <i class="bi bi-chevron-left"></i> Clientes
+  </a>
+  <h1 class="h3 mb-0 mt-1">
+    {% if client_user %}Editar: {{ client_user.get_full_name }}{% else %}Nuevo cliente{% endif %}
+  </h1>
+</div>
+
+<div class="row">
+  <div class="col-md-7">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">Datos de acceso</div>
+        <div class="card-body">
+          {% for field in form %}
+            <div class="mb-3">
+              <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}
+                <div class="form-text">{{ field.help_text }}</div>
+              {% endif %}
+              {% if field.errors %}
+                <div class="text-danger small">{{ field.errors }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if profile_form %}
+        <div class="card shadow-sm mb-4">
+          <div class="card-header">Perfil del cliente</div>
+          <div class="card-body">
+            {% for field in profile_form %}
+              <div class="mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                  <div class="text-danger small">{{ field.errors }}</div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-save me-2"></i>
+        {% if client_user %}Guardar cambios{% else %}Crear cliente{% endif %}
+      </button>
+      <a href="{% url 'gym_admin:client_list' %}" class="btn btn-outline-secondary ms-2">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

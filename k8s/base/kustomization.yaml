@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: gymadmin
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - configmap-backup-script.yaml
+  - pvc-db.yaml
+  - pvc-backup.yaml
+  - deployment.yaml
+  - service.yaml
+  - cronjob-backup.yaml
+
+images:
+  - name: gymadmin
+    newTag: latest

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gymadmin-config
+  namespace: gymadmin
+data:
+  DJANGO_ENV: "prod"
+  DJANGO_ALLOWED_HOSTS: "gym.example.com"
+  DB_PATH: "/app/data/db.sqlite3"
+  MEDIA_ROOT: "/app/media"

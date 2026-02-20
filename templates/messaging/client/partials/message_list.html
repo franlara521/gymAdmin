@@ -1,0 +1,21 @@
+{% for msg in messages_list %}
+  <div class="d-flex {% if msg.sender == request.user %}justify-content-end{% else %}justify-content-start{% endif %} mb-3">
+    <div class="rounded px-3 py-2 shadow-sm"
+         style="max-width: 75%;
+                background: {% if msg.sender == request.user %}#0d6efd{% else %}#f8f9fa{% endif %};
+                color: {% if msg.sender == request.user %}#fff{% else %}#212529{% endif %};">
+      <div style="font-size:0.7rem; opacity:0.7; margin-bottom:2px;">
+        {% if msg.sender != request.user %}
+          <i class="bi bi-shield-fill me-1"></i>Equipo GymAdmin ·
+        {% endif %}
+        {{ msg.sent_at|date:"d/m H:i" }}
+      </div>
+      <div style="white-space: pre-line;">{{ msg.body }}</div>
+    </div>
+  </div>
+{% empty %}
+  <div class="text-center text-muted py-4">
+    <i class="bi bi-chat-dots" style="font-size:2rem;"></i>
+    <p class="mt-2 small">Aún no hay mensajes. ¡Escríbenos!</p>
+  </div>
+{% endfor %}

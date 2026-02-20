@@ -1,0 +1,64 @@
+{% extends "base_trainer.html" %}
+{% block title %}Conversación con {{ thread.client.get_full_name|default:thread.client.username }} — Entrenador{% endblock %}
+{% block nav_messages %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center gap-3 mb-4">
+  <a href="{% url 'trainer_messaging:inbox' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left"></i>
+  </a>
+  <h1 class="h4 mb-0">
+    <i class="bi bi-person-circle me-2"></i>
+    {{ thread.client.get_full_name|default:thread.client.username }}
+  </h1>
+</div>
+
+<!-- Lista de mensajes -->
+<div class="card shadow-sm mb-3" style="max-height:500px;overflow-y:auto;" id="message-box">
+  <div class="card-body d-flex flex-column gap-3">
+    {% for msg in messages_list %}
+      <div class="d-flex {% if msg.sender == request.user %}justify-content-end{% endif %}">
+        <div class="p-3 rounded-3 {% if msg.sender == request.user %}bg-warning bg-opacity-25 text-end{% else %}bg-light{% endif %}"
+             style="max-width:70%;">
+          <div class="small text-muted mb-1">
+            {% if msg.sender == request.user %}Tú{% else %}{{ msg.sender.get_full_name|default:msg.sender.username }}{% endif %}
+            · {{ msg.sent_at|date:"d/m H:i" }}
+          </div>
+          <div>{{ msg.body }}</div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted text-center">Aún no hay mensajes en esta conversación.</p>
+    {% endfor %}
+  </div>
+</div>
+
+{% if messages %}
+  {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }} alert-dismissible fade show">
+      {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<!-- Formulario de respuesta -->
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form method="post" action="{% url 'trainer_messaging:reply' thread.pk %}">
+      {% csrf_token %}
+      <div class="mb-3">
+        <textarea name="body" class="form-control" rows="3" placeholder="Escribe tu respuesta…" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-warning">
+        <i class="bi bi-send me-1"></i>Enviar respuesta
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Scroll al final de los mensajes
+  const box = document.getElementById('message-box');
+  if (box) box.scrollTop = box.scrollHeight;
+</script>
+{% endblock %}

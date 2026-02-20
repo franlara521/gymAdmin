@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gymadmin
+  namespace: gymadmin
+spec:
+  replicas: 1          # CRÍTICO: SQLite no admite escrituras concurrentes
+  strategy:
+    type: Recreate     # Recreate evita dos pods simultáneos tocando el .db
+  selector:
+    matchLabels:
+      app: gymadmin
+  template:
+    metadata:
+      labels:
+        app: gymadmin
+    spec:
+      containers:
+        - name: gymadmin
+          image: gymadmin:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: gymadmin-config
+            - secretRef:
+                name: gymadmin-secret   # DJANGO_SECRET_KEY, etc.
+          volumeMounts:
+            - name: db-volume
+              mountPath: /app/data
+            - name: backup-volume
+              mountPath: /app/backups
+            - name: media-volume
+              mountPath: /app/media
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /auth/login/
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /auth/login/
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+      volumes:
+        - name: db-volume
+          persistentVolumeClaim:
+            claimName: gymadmin-db-pvc
+        - name: backup-volume
+          persistentVolumeClaim:
+            claimName: gymadmin-backup-pvc
+        - name: media-volume
+          emptyDir: {}   # Para producción real: usar PVC separado para avatares

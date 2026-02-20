@@ -1,0 +1,9 @@
+# Dependencias de producción — GymAdmin
+# Generado de pyproject.toml. Para desarrollo usa requirements-dev.txt
+Django==5.2.11
+asgiref==3.11.1
+sqlparse==0.5.5
+gunicorn==25.1.0
+whitenoise==6.11.0
+brotli==1.2.0
+pillow==12.1.1

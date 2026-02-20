@@ -1,0 +1,37 @@
+{% extends "base_client.html" %}
+{% block title %}{{ plan.title }} — GymAdmin{% endblock %}
+{% block nav_training %}active{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{% url 'client_training:plan_list' %}" class="text-muted text-decoration-none small">
+    <i class="bi bi-chevron-left"></i> Mis planes
+  </a>
+  <div class="d-flex align-items-center gap-3 mt-2">
+    <h1 class="h3 mb-0">{{ plan.title }}</h1>
+    <span class="badge
+      {% if plan.plan_type == 'training' %}bg-primary
+      {% elif plan.plan_type == 'diet' %}bg-success
+      {% else %}bg-warning text-dark{% endif %}">
+      {{ plan.get_plan_type_display }}
+    </span>
+  </div>
+  <p class="text-muted small mt-1">
+    Actualizado el {{ plan.updated_at|date:"d/m/Y" }}
+    {% if plan.created_by %} por {{ plan.created_by.get_full_name|default:plan.created_by.username }}{% endif %}
+  </p>
+</div>
+
+{% for section in plan.sections.all %}
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-light fw-bold">
+      <i class="bi bi-bookmark me-2"></i>{{ section.title }}
+    </div>
+    <div class="card-body">
+      <div style="white-space: pre-line;">{{ section.content }}</div>
+    </div>
+  </div>
+{% empty %}
+  <p class="text-muted">Este plan no tiene secciones aún.</p>
+{% endfor %}
+{% endblock %}

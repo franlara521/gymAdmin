@@ -1,0 +1,26 @@
+[project]
+name = "gymadmin"
+version = "0.1.0"
+description = "Functional training gym administration system"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.1,<6.0",
+    "whitenoise[brotli]>=6.7",
+    "gunicorn>=22.0",
+    "pillow>=10.0",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "django-debug-toolbar>=4.4",
+    "pytest-django>=4.9",
+    "factory-boy>=3.3",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "gym.settings"
+python_files = "tests.py test_*.py *_tests.py"

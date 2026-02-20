@@ -1,0 +1,143 @@
+{% extends "base_admin.html" %}
+{% block title %}Dashboard — GymAdmin{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-speedometer2 me-2"></i>Dashboard del gimnasio</h1>
+
+<!-- KPIs -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="card shadow-sm border-start border-primary border-4">
+      <div class="card-body d-flex align-items-center gap-3">
+        <i class="bi bi-people-fill text-primary" style="font-size:2rem;"></i>
+        <div>
+          <div class="h3 mb-0">{{ total_active_clients }}</div>
+          <div class="small text-muted">Clientes activos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card shadow-sm border-start border-success border-4">
+      <div class="card-body d-flex align-items-center gap-3">
+        <i class="bi bi-calendar3 text-success" style="font-size:2rem;"></i>
+        <div>
+          <div class="h3 mb-0">{{ classes_this_week }}</div>
+          <div class="small text-muted">Clases esta semana</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card shadow-sm border-start border-warning border-4">
+      <div class="card-body d-flex align-items-center gap-3">
+        <i class="bi bi-bookmark-check text-warning" style="font-size:2rem;"></i>
+        <div>
+          <div class="h3 mb-0">{{ bookings_this_week }}</div>
+          <div class="small text-muted">Reservas esta semana</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <a href="{% url 'admin_messaging:inbox' %}" class="text-decoration-none">
+      <div class="card shadow-sm border-start border-danger border-4 {% if pending_messages %}bg-danger bg-opacity-10{% endif %}">
+        <div class="card-body d-flex align-items-center gap-3">
+          <i class="bi bi-chat-dots {% if pending_messages %}text-danger{% else %}text-secondary{% endif %}" style="font-size:2rem;"></i>
+          <div>
+            <div class="h3 mb-0 {% if pending_messages %}text-danger{% endif %}">{{ pending_messages }}</div>
+            <div class="small text-muted">Mensajes sin leer</div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Gráficos -->
+<div class="row g-4 mb-4">
+  <div class="col-12 col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header"><i class="bi bi-graph-up me-2"></i>Reservas por semana (últimas 12 semanas)</div>
+      <div class="card-body">
+        <canvas id="attendanceChart" height="80"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header"><i class="bi bi-pie-chart me-2"></i>Clases más populares</div>
+      <div class="card-body d-flex align-items-center justify-content-center">
+        <canvas id="popularChart" height="180"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Últimas reservas -->
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-clock-history me-2"></i>Últimas reservas</span>
+    <a href="{% url 'admin_schedule:class_list' %}" class="btn btn-sm btn-outline-primary">Ver clases</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Cliente</th>
+          <th>Clase</th>
+          <th>Fecha de clase</th>
+          <th>Reservado el</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for booking in recent_bookings %}
+          <tr>
+            <td>
+              <a href="{% url 'gym_admin:client_detail' booking.client.pk %}">
+                {{ booking.client.get_full_name|default:booking.client.username }}
+              </a>
+            </td>
+            <td>
+              <span class="d-inline-block rounded-circle me-1"
+                    style="width:10px;height:10px;background:{{ booking.gym_class.class_type.color }};"></span>
+              {{ booking.gym_class.class_type.name }}
+            </td>
+            <td>{{ booking.gym_class.start_datetime|date:"d/m/Y H:i" }}</td>
+            <td class="text-muted">{{ booking.booked_at|date:"d/m/Y H:i" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4" class="text-center text-muted py-4">Sin reservas recientes.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  new Chart(document.getElementById('attendanceChart').getContext('2d'), {
+    type: 'line',
+    data: {{ attendance_chart_data|safe }},
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+  });
+
+  new Chart(document.getElementById('popularChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {{ popular_chart_data|safe }},
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+</script>
+{% endblock %}
